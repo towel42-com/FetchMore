@@ -48,8 +48,8 @@ target_link_libraries( FetchMore
                  Qt5::Widgets
                  Qt5::Core
                  Qt5::Xml
-		 Qt5::Test
-                 SABUtils
+                 Qt5::Test
+                 #SABUtils
           )
 DeployQt( FetchMore . )
 DeploySystem( FetchMore )

@@ -42,7 +42,7 @@ QVariant TreeModel::data(const QModelIndex &index, int role) const
 Qt::ItemFlags TreeModel::flags(const QModelIndex &index) const
 {
     if (!index.isValid())
-        return nullptr;
+        return QAbstractItemModel::flags( index );
 
     return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 }
@@ -110,11 +110,12 @@ int TreeModel::rowCount(const QModelIndex &parent) const
     else
         parentItem = static_cast<TreeItem*>(parent.internalPointer());
 
-    if(0 == getCurrentChildCount(parentItem))
-        return parentItem->childCount();
+    if ( !parentItem )
+        return 0;
 
-     return getCurrentChildCount(parentItem);
+    return parentItem->childCount();
 }
+
 QModelIndex TreeModel::index(int row, int column, const QModelIndex &parent)
             const
 {
@@ -172,7 +173,7 @@ void TreeModel::setupModelData(const QStringList &lines, TreeItem *parent)
 
         if (!lineData.isEmpty()) {
             // Read the column data from the rest of the line.
-            QStringList columnStrings = lineData.split("\t", QString::SkipEmptyParts);
+            QStringList columnStrings = lineData.split("\t", Qt::SkipEmptyParts);
             QList<QVariant> columnData;
             for (int column = 0; column < columnStrings.count(); ++column)
                 columnData << columnStrings[column];
