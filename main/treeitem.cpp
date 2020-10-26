@@ -2,10 +2,11 @@
 #include <stdio.h>
 #include "treeitem.h"
 
-TreeItem::TreeItem(const QList<QVariant> &data, TreeItem *parent)
+TreeItem::TreeItem(const QList<QString> &data, TreeItem *parent)
 {
     parentItem = parent;
-    itemData = data;
+    for ( auto && jj : data )
+        itemData << jj;
 }
 TreeItem::~TreeItem()
 {

@@ -44,4 +44,4 @@ option( gtest_force_shared_crt "Use shared ( DLL ) run-time lib even when Google
 #enable_testing()
 
 add_subdirectory( main )
-#add_subdirectory( SABUtils )
+add_subdirectory( SABUtils )

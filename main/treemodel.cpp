@@ -12,10 +12,11 @@ TreeModel::TreeModel( QObject * parent )
 }
 void TreeModel::load( const QString & data )
 {
-    QList<QVariant> rootData;
+    QList<QString> rootData;
     rootData << "Title" << "Summary";
     rootItem = new TreeItem( rootData );
-    setupModelData( data.split( QString( "\n" ) ), rootItem );
+    auto parentStack = QList< TreeItem * >() << rootItem;
+    setupModelData( data.split( QString( "\n" ) ), parentStack );
 }
 TreeModel::~TreeModel()
 {
@@ -148,6 +149,7 @@ QModelIndex TreeModel::index( int row, int column, const QModelIndex & parent ) 
     else
         return QModelIndex();
 }
+
 QModelIndex TreeModel::parent( const QModelIndex & index ) const
 {
     if ( !index.isValid() )
@@ -165,66 +167,45 @@ QModelIndex TreeModel::parent( const QModelIndex & index ) const
     return createIndex( parentItem->row(), 0, parentItem );
 }
 
-void TreeModel::setupModelData( const QStringList & lines, TreeItem * parent )
+void TreeModel::setupModelData( const QStringList & lines, QList< TreeItem * > & parentStack )
 {
-    QList<TreeItem *> parents;
-    QList<int> indentations;
-    parents << parent;
-    indentations << 0;
-
-    int number = 0;
-
+    Q_ASSERT( !parentStack.isEmpty() );
+    int prevDepth = -1;
+    int ii = 0; 
+    TreeItem * prevItem = parentStack.back();
     int topParentNum = 0;
-    while ( number < lines.count() )
+    for( auto && currLine : lines )
     {
-        int position = 0;
-        while ( position < lines[ number ].length() )
+        auto columns = currLine.split( "\t", Qt::KeepEmptyParts );
+        int depth = 0;
+        while( !columns.isEmpty() && columns[ 0 ].isEmpty() )
         {
-            if ( lines[ number ].mid( position, 1 ) != " " )
-                break;
-            position++;
+            depth++;
+            columns.pop_front();
+        }
+        columns.removeAll( QString() );
+        if ( columns.isEmpty() )
+            continue;
+        
+        if ( depth > prevDepth ) // new parent
+        {
+            parentStack.push_back( prevItem );
+        }
+        else if ( depth < prevDepth ) // pop parent
+        {
+            if ( parentStack.count() > 1 )
+                parentStack.pop_back();
+        }
+        auto parentItem = parentStack.back();
+        prevDepth = depth;
+
+        prevItem = new TreeItem( columns, parentItem );
+        if ( parentStack.count() <= 2 )
+        {
+            prevItem->addSuffix( topParentNum++ ); 
         }
 
-        QString lineData = lines[ number ].mid( position ).trimmed();
-
-        if ( !lineData.isEmpty() )
-        {
-            // Read the column data from the rest of the line.
-            QStringList columnStrings = lineData.split( "\t", Qt::SkipEmptyParts );
-            QList<QVariant> columnData;
-            for ( int column = 0; column < columnStrings.count(); ++column )
-                columnData << columnStrings[ column ];
-
-            if ( position > indentations.last() )
-            {
-                // The last child of the current parent is now the new parent
-                // unless the current parent has no children.
-
-                if ( parents.last()->childCount() > 0 )
-                {
-                    parents << parents.last()->child( parents.last()->childCount() - 1 );
-                    indentations << position;
-                }
-            }
-            else
-            {
-                while ( position < indentations.last() && parents.count() > 0 )
-                {
-                    parents.pop_back();
-                    indentations.pop_back();
-                }
-            }
-
-            // Append a new item to the current parent's list of children.
-            TreeItem * item = new TreeItem( columnData, parents.last() );
-            if ( parents.last()->parent() == nullptr )
-            {
-                item->addSuffix( topParentNum ++ ); 
-            }
-            parents.last()->appendChild( item );
-        }
-
-        number++;
+        parentItem->appendChild( prevItem );
     }
 }
 

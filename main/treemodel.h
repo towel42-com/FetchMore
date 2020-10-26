@@ -16,9 +16,8 @@ public:
     MainWindow(QWidget *parent = NULL);
     virtual ~MainWindow();
 
-    virtual bool eventFilter( QObject * object, QEvent * event ) override;
 private:
-    QAbstractItemView * view;
+    QTreeView * fView;
 };
 
 class TreeItem;
@@ -46,7 +45,7 @@ public:
     //    void emitLayoutChangedSignal();
 
 private:
-    void setupModelData(const QStringList &lines, TreeItem *parent);
+    void setupModelData(const QStringList &lines, QList< TreeItem * > & parentStack );
     std::map<TreeItem*, int> itemToChildShownCount;
     TreeItem *rootItem;
 
