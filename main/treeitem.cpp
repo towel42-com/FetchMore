@@ -11,6 +11,13 @@ TreeItem::~TreeItem()
 {
     qDeleteAll(childItems);
 }
+void TreeItem::addSuffix( int cnt )
+{
+    auto string = itemData[ 0 ].toString();
+    string += ": " + QString::number( cnt );
+    itemData[ 0 ] = string;
+}
+
 void TreeItem::appendChild(TreeItem *item)
 {
     childItems.append(item);

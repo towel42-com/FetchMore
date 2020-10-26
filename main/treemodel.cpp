@@ -174,6 +174,7 @@ void TreeModel::setupModelData( const QStringList & lines, TreeItem * parent )
 
     int number = 0;
 
+    int topParentNum = 0;
     while ( number < lines.count() )
     {
         int position = 0;
@@ -215,15 +216,12 @@ void TreeModel::setupModelData( const QStringList & lines, TreeItem * parent )
             }
 
             // Append a new item to the current parent's list of children.
-            TreeItem * item_1 = new TreeItem( columnData, parents.last() );
-            parents.last()->appendChild( item_1 );
-
-            //auto child1 = new TreeItem( QList< QVariant >() << "1-Column1" << "1-Column2", item_1 );
-            //auto child2 = new TreeItem( QList< QVariant >() << "2-Column1" << "2-Column2", item_1 );
-            //auto child3 = new TreeItem( QList< QVariant >() << "3-Column1" << "3-Column2", item_1 );
-            //item_1->appendChild( child1 );
-            //item_1->appendChild( child2 );
-            //item_1->appendChild( child3 );
+            TreeItem * item = new TreeItem( columnData, parents.last() );
+            if ( parents.last()->parent() == nullptr )
+            {
+                item->addSuffix( topParentNum ++ ); 
+            }
+            parents.last()->appendChild( item );
         }
 
         number++;
@@ -235,5 +233,4 @@ bool TreeModel::hasChildren( const QModelIndex & parent ) const
     bool retVal = QAbstractItemModel::hasChildren( parent ) || canFetchMore( parent );
     return retVal;
 }
-
 

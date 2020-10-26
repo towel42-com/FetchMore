@@ -20,6 +20,7 @@ public:
     int row() const;
     TreeItem *parent();
 
+    void addSuffix( int suffix );
 private:
     QList<TreeItem*> childItems;
     QList<QVariant> itemData;
