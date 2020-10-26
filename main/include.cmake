@@ -3,12 +3,12 @@ set(qtproject_SRCS
     treeitem.cpp
     treemodel.cpp
     filelistmodel.cpp
-window.cpp
+    window.cpp
 )
 
 set(qtproject_H
-    treemodel.h
-    filelistmodel.h
+   treemodel.h
+   filelistmodel.h
    window.h
 )
 
