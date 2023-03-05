@@ -11,6 +11,9 @@
 #include <QTreeView>
 #include <QScrollBar>
 
+#include <cstdint>
+#include <iostream>
+
 MainWindow::MainWindow( QWidget * parent )
     : QMainWindow( parent )
 {
